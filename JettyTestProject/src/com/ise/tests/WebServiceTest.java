@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -25,8 +26,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 import com.ise.entities.WebEntity;
+import com.ise.services.XmlService;
 
 /**
  * 
@@ -34,6 +37,7 @@ import com.ise.entities.WebEntity;
  *
  */
 class WebServiceTest {
+
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 
@@ -75,8 +79,19 @@ class WebServiceTest {
 
 		WebEntity client = new WebEntity();
 		String fetchedPomData = client.getContent(new URL("http://localhost:8090/pom.xml"));
-		
+
 		assertEquals(content, fetchedPomData);
+	}
+
+	@Test
+	public void testArtifactId() {
+		boolean checkDependency = false;
+		try {
+			checkDependency = XmlService.fetchDataFromPomXml("pom.xml");
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		assertEquals(true, checkDependency);
 	}
 
 	private static class ContentHandler extends AbstractHandler {
